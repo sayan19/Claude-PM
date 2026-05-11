@@ -1,0 +1,22 @@
+email:
+  P0:
+    to: ["leadership@soti.example", "pmm@soti.example"]
+    cc: []
+    subject_prefix: "[P0 COMPETE]"
+  P1:
+    to: ["pm-team@soti.example"]
+    cc: []
+    subject_prefix: "[Compete Daily]"
+    digest: true
+  P2:
+    digest_only: true
+  sentiment:
+    to: ["pm-team@soti.example", "pmm@soti.example"]
+    subject_prefix: "[Compete Sentiment]"
+
+teams:
+  P0:
+    webhook_env: TEAMS_WEBHOOK_URL
+    title_prefix: "P0 Competitive Alert"
+  P1:
+    enabled: false

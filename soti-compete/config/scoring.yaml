@@ -1,0 +1,65 @@
+weights:
+  strategic_impact: 30
+  sales_signal: 25
+  roadmap_overlap: 20
+  competitor_tier: 15
+  source_quality: 10
+
+tier_scores:
+  direct: 10
+  adjacent: 6
+
+source_quality_scores:
+  sec_filing: 10
+  vendor_press: 10
+  analyst: 10
+  tier_1_press: 8
+  secondary_press: 5
+  blog: 2
+  forum: 2
+
+phase_1_defaults:
+  sales_signal_no_deal_motion: 4
+  sales_signal_with_deal_motion: 6
+  roadmap_overlap_conservative: 4
+
+recency:
+  default:
+    - { max_days: 7, multiplier: 1.0 }
+    - { max_days: 30, multiplier: 0.7 }
+    - { max_days: 90, multiplier: 0.4 }
+    - { max_days: null, multiplier: 0.2 }
+  acquisition:
+    - { max_days: 14, multiplier: 1.0 }
+    - { max_days: 60, multiplier: 0.7 }
+    - { max_days: 180, multiplier: 0.4 }
+    - { max_days: null, multiplier: 0.2 }
+
+confidence:
+  multi_source: 1.0
+  single_tier1: 1.0
+  single: 0.8
+  rumor: 0.5
+
+buckets:
+  - { name: P0, min: 7.5 }
+  - { name: P1, min: 5.0 }
+  - { name: P2, min: 2.5 }
+  - { name: DROP, min: 0.0 }
+
+news_types:
+  - acquisition
+  - feature_launch
+  - pricing
+  - exec_change
+  - customer_win
+  - customer_loss
+  - partnership
+  - security
+  - regulatory
+  - analyst
+
+response_types:
+  - obligation
+  - initiative
+  - housekeeping

@@ -1,0 +1,49 @@
+tier_1_press_domains:
+  - bloomberg.com
+  - reuters.com
+  - wsj.com
+  - ft.com
+  - nytimes.com
+  - theinformation.com
+  - techcrunch.com
+  - theregister.com
+  - zdnet.com
+  - crn.com
+  - computerworld.com
+  - arstechnica.com
+  - cnbc.com
+
+analyst_domains:
+  - gartner.com
+  - forrester.com
+  - idc.com
+  - omdia.com
+
+sec_filing_domains:
+  - sec.gov
+
+vendor_press_domains:
+  jamf: ["jamf.com"]
+  omnissa: ["omnissa.com", "vmware.com"]
+  intune: ["microsoft.com", "techcommunity.microsoft.com"]
+  ivanti: ["ivanti.com"]
+  maas360: ["ibm.com"]
+  42gears: ["42gears.com"]
+  hexnode: ["hexnode.com"]
+  scalefusion: ["scalefusion.com"]
+  knox: ["samsungknox.com", "samsung.com"]
+
+blocked_domains:
+  - pinterest.com
+  - facebook.com
+  - x.com
+  - twitter.com
+
+sentiment_sources:
+  reddit:
+    allowed_domains: ["reddit.com"]
+    subreddits: ["sysadmin", "k12sysadmin", "msp", "ITManagers", "mdm"]
+  peerspot:
+    allowed_domains: ["peerspot.com"]
+  g2:
+    allowed_domains: ["g2.com"]

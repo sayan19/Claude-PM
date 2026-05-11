@@ -1,0 +1,54 @@
+competitors:
+  - id: jamf
+    name: Jamf
+    tier: direct
+    aliases: ["Jamf Pro", "Jamf School", "Jamf Now", "Jamf Connect"]
+    search_hints: ["Apple MDM", "Mac management", "iOS device management"]
+
+  - id: omnissa
+    name: Omnissa
+    tier: direct
+    aliases: ["Workspace ONE", "VMware Workspace ONE", "AirWatch"]
+    search_hints: ["UEM", "EUC"]
+
+  - id: intune
+    name: Microsoft Intune
+    tier: direct
+    aliases: ["Intune", "Microsoft Endpoint Manager", "MEM"]
+    search_hints: ["Endpoint Manager", "Configuration Manager", "Autopilot"]
+
+  - id: ivanti
+    name: Ivanti
+    tier: direct
+    aliases: ["Ivanti Neurons", "MobileIron"]
+    search_hints: ["unified endpoint management", "Neurons for UEM"]
+
+  - id: maas360
+    name: MaaS360
+    tier: direct
+    aliases: ["IBM MaaS360", "MaaS360 with Watson"]
+    search_hints: ["IBM Security", "Watson MDM"]
+
+  - id: 42gears
+    name: 42Gears
+    tier: adjacent
+    aliases: ["SureMDM", "42Gears SureMDM"]
+    search_hints: ["kiosk management", "rugged device management"]
+
+  - id: hexnode
+    name: Hexnode
+    tier: adjacent
+    aliases: ["Hexnode UEM", "Hexnode MDM"]
+    search_hints: ["small business MDM"]
+
+  - id: scalefusion
+    name: Scalefusion
+    tier: adjacent
+    aliases: ["Scalefusion MDM", "MobiLock"]
+    search_hints: ["kiosk lockdown"]
+
+  - id: knox
+    name: Samsung Knox
+    tier: adjacent
+    aliases: ["Knox Manage", "Knox Suite", "Knox Configure"]
+    search_hints: ["Samsung enterprise", "Android Enterprise"]

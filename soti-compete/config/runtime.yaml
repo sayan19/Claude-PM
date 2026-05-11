@@ -1,0 +1,31 @@
+model:
+  id: claude-sonnet-4-6
+  max_tokens: 8192
+
+timezone: America/Toronto
+
+storage:
+  backend: sqlite
+  sqlite_path: data/soti_compete.db
+
+web_search:
+  budgets:
+    daily: 30
+    hourly: 5
+    sentiment_per_competitor: 10
+    pastein: 0
+  default_max_uses: 5
+
+dedup:
+  title_similarity_threshold: 90
+  lookback_days: 30
+
+flows:
+  daily:
+    lookback_days: 7
+  hourly:
+    lookback_hours: 24
+    competitor_tiers: ["direct"]
+    routed_buckets: ["P0"]
+  sentiment:
+    lookback_days: 30
