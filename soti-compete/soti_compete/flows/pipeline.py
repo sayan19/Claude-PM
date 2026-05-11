@@ -17,7 +17,7 @@ import hashlib
 import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlsplit
 
 from soti_compete.classify import (
@@ -40,6 +40,10 @@ from soti_compete.storage import Brief, Storage
 from soti_compete.time_utils import age_days, now_utc, parse_when
 
 log = logging.getLogger(__name__)
+
+ROADMAP_STUB = "[STUB] Jira/Productboard not connected. Replace with PRD/epic when wired."
+
+P1Strategy = Literal["digest", "individual", "none"]
 
 
 @dataclass
@@ -255,6 +259,15 @@ def _send_p1_digest(
     return res.success
 
 
+def _send_p1_individual(brief: Brief, *, config: Config, smtp: SMTPNotifier) -> None:
+    route = config.routing.email.get("P1")
+    if not route or not route.to:
+        return
+    subject = f"{route.subject_prefix} {brief.title}".strip()
+    rendered = render_email([brief], subject=subject, heading=subject)
+    smtp.send(to=route.to, cc=route.cc, rendered=rendered)
+
+
 def persist_and_route(
     briefs: list[Brief],
     *,
@@ -263,14 +276,13 @@ def persist_and_route(
     smtp: SMTPNotifier,
     teams: TeamsNotifier,
     flow: str,
-    route_p1_digest: bool = False,
-    route_p1_individually: bool = False,
+    p1_strategy: P1Strategy = "none",
 ) -> FlowResult:
     result = FlowResult(flow=flow, briefs_total=len(briefs))
+    storage.save_briefs(briefs)
 
     p1_items: list[Brief] = []
     for b in briefs:
-        storage.save_brief(b)
         result.briefs_persisted += 1
         result.by_bucket[b.bucket] = result.by_bucket.get(b.bucket, 0) + 1
 
@@ -279,16 +291,12 @@ def persist_and_route(
             result.p0_emails_sent += int(email_sent)
             result.p0_teams_sent += int(teams_sent)
         elif b.bucket == "P1":
-            if route_p1_individually:
-                route = config.routing.email.get("P1")
-                if route and route.to:
-                    subject = f"{route.subject_prefix} {b.title}".strip()
-                    rendered = render_email([b], subject=subject, heading=subject)
-                    smtp.send(to=route.to, cc=route.cc, rendered=rendered)
-            else:
+            if p1_strategy == "individual":
+                _send_p1_individual(b, config=config, smtp=smtp)
+            elif p1_strategy == "digest":
                 p1_items.append(b)
 
-    if route_p1_digest and p1_items:
+    if p1_strategy == "digest" and p1_items:
         result.p1_digest_sent = _send_p1_digest(p1_items, config=config, smtp=smtp, flow=flow)
 
     return result

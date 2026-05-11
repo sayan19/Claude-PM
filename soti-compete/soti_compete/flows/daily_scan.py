@@ -6,6 +6,7 @@ import logging
 
 from soti_compete.config import Config
 from soti_compete.flows.pipeline import (
+    ROADMAP_STUB,
     FlowResult,
     dedupe_briefs,
     persist_and_route,
@@ -23,8 +24,6 @@ from soti_compete.storage import Storage
 from soti_compete.time_utils import now_local
 
 log = logging.getLogger(__name__)
-
-ROADMAP_STUB = "[STUB] Jira/Productboard not connected. Replace with PRD/epic when wired."
 
 
 def run_daily_scan(
@@ -77,7 +76,7 @@ def run_daily_scan(
         smtp=smtp,
         teams=teams,
         flow="daily",
-        route_p1_digest=True,
+        p1_strategy="digest",
     )
     result.briefs_total = len(parsed.records)
     result.briefs_deduped = dropped

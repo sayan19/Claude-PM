@@ -89,21 +89,10 @@ class SMTPNotifier(Notifier):
             return NotifyResult(success=True, dry_run=True, detail=str(path), payload=rendered)
 
         try:
-            if self.port == 465:
-                ctx = ssl.create_default_context()
-                with smtplib.SMTP_SSL(self.host, self.port, context=ctx, timeout=30) as s:
-                    if self.username:
-                        s.login(self.username, self.password)
-                    s.send_message(msg, to_addrs=recipients)
-            else:
-                with smtplib.SMTP(self.host, self.port, timeout=30) as s:
-                    s.ehlo()
-                    if self.use_tls:
-                        s.starttls(context=ssl.create_default_context())
-                        s.ehlo()
-                    if self.username:
-                        s.login(self.username, self.password)
-                    s.send_message(msg, to_addrs=recipients)
+            with self._open_smtp(timeout=30) as s:
+                if self.username:
+                    s.login(self.username, self.password)
+                s.send_message(msg, to_addrs=recipients)
         except (smtplib.SMTPException, OSError) as e:
             log.error("smtp send failed: %s", e)
             return NotifyResult(success=False, detail=str(e))
@@ -115,16 +104,24 @@ class SMTPNotifier(Notifier):
         if not self.host:
             return False
         try:
-            if self.port == 465:
-                with smtplib.SMTP_SSL(self.host, self.port, timeout=10) as s:
-                    s.noop()
-            else:
-                with smtplib.SMTP(self.host, self.port, timeout=10) as s:
-                    s.ehlo()
+            with self._open_smtp(timeout=10) as s:
+                s.noop()
             return True
         except (smtplib.SMTPException, OSError) as e:
             log.warning("smtp ping failed: %s", e)
             return False
+
+    def _open_smtp(self, *, timeout: int) -> smtplib.SMTP:
+        if self.port == 465:
+            return smtplib.SMTP_SSL(
+                self.host, self.port, context=ssl.create_default_context(), timeout=timeout,
+            )
+        s = smtplib.SMTP(self.host, self.port, timeout=timeout)
+        s.ehlo()
+        if self.use_tls:
+            s.starttls(context=ssl.create_default_context())
+            s.ehlo()
+        return s
 
 
 __all__ = ["SMTPNotifier"]

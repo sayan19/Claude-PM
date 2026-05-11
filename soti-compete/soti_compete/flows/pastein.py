@@ -6,6 +6,7 @@ import logging
 
 from soti_compete.config import Config
 from soti_compete.flows.pipeline import (
+    ROADMAP_STUB,
     FlowResult,
     persist_and_route,
     score_and_build_brief,
@@ -17,8 +18,6 @@ from soti_compete.notify import SMTPNotifier, TeamsNotifier
 from soti_compete.storage import Storage
 
 log = logging.getLogger(__name__)
-
-ROADMAP_STUB = "[STUB] Jira/Productboard not connected. Replace with PRD/epic when wired."
 
 
 def run_pastein(
@@ -58,7 +57,7 @@ def run_pastein(
         smtp=smtp,
         teams=teams,
         flow="pastein",
-        route_p1_individually=True,
+        p1_strategy="individual",
     )
     result.briefs_total = len(parsed.records)
     result.briefs_unknown_competitor = unknown

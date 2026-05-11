@@ -52,6 +52,16 @@ CREATE INDEX IF NOT EXISTS idx_sentiment_created ON sentiment_snapshots(created_
 """
 
 
+_INSERT_BRIEF_SQL = """
+INSERT OR REPLACE INTO briefs (
+    id, url, url_fingerprint, title, competitor_id, news_type, response_type,
+    confidence_signal, bucket, raw_score, recency_multiplier, confidence_multiplier,
+    final_score, dimensions_json, summary, gap_analysis_json, sources_json,
+    raw_payload_json, flow, created_at
+) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+"""
+
+
 def _iso(dt: datetime) -> str:
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=UTC)
@@ -60,6 +70,31 @@ def _iso(dt: datetime) -> str:
 
 def _parse(iso: str) -> datetime:
     return datetime.fromisoformat(iso)
+
+
+def _brief_row(brief: Brief) -> tuple:
+    return (
+        brief.id,
+        brief.url,
+        brief.url_fingerprint,
+        brief.title,
+        brief.competitor_id,
+        brief.news_type,
+        brief.response_type,
+        brief.confidence_signal,
+        brief.bucket,
+        brief.raw_score,
+        brief.recency_multiplier,
+        brief.confidence_multiplier,
+        brief.final_score,
+        json.dumps(brief.dimensions),
+        brief.summary,
+        json.dumps(brief.gap_analysis),
+        json.dumps(brief.sources),
+        json.dumps(brief.raw_payload),
+        brief.flow,
+        _iso(brief.created_at),
+    )
 
 
 class SQLiteStorage(Storage):
@@ -80,38 +115,13 @@ class SQLiteStorage(Storage):
 
     def save_brief(self, brief: Brief) -> None:
         with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO briefs (
-                    id, url, url_fingerprint, title, competitor_id, news_type, response_type,
-                    confidence_signal, bucket, raw_score, recency_multiplier, confidence_multiplier,
-                    final_score, dimensions_json, summary, gap_analysis_json, sources_json,
-                    raw_payload_json, flow, created_at
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
-                """,
-                (
-                    brief.id,
-                    brief.url,
-                    brief.url_fingerprint,
-                    brief.title,
-                    brief.competitor_id,
-                    brief.news_type,
-                    brief.response_type,
-                    brief.confidence_signal,
-                    brief.bucket,
-                    brief.raw_score,
-                    brief.recency_multiplier,
-                    brief.confidence_multiplier,
-                    brief.final_score,
-                    json.dumps(brief.dimensions),
-                    brief.summary,
-                    json.dumps(brief.gap_analysis),
-                    json.dumps(brief.sources),
-                    json.dumps(brief.raw_payload),
-                    brief.flow,
-                    _iso(brief.created_at),
-                ),
-            )
+            conn.execute(_INSERT_BRIEF_SQL, _brief_row(brief))
+
+    def save_briefs(self, briefs: list[Brief]) -> None:
+        if not briefs:
+            return
+        with self._connect() as conn:
+            conn.executemany(_INSERT_BRIEF_SQL, [_brief_row(b) for b in briefs])
 
     def get_brief(self, brief_id: str) -> Brief | None:
         with self._connect() as conn:

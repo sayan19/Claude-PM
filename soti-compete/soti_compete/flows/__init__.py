@@ -2,6 +2,7 @@ from soti_compete.flows.daily_scan import run_daily_scan
 from soti_compete.flows.hourly_sweep import run_hourly_sweep
 from soti_compete.flows.pastein import run_pastein
 from soti_compete.flows.pipeline import (
+    ROADMAP_STUB,
     FlowResult,
     dedupe_briefs,
     persist_and_route,
@@ -11,6 +12,7 @@ from soti_compete.flows.sentiment_monthly import run_sentiment_monthly
 
 __all__ = [
     "FlowResult",
+    "ROADMAP_STUB",
     "dedupe_briefs",
     "persist_and_route",
     "run_daily_scan",

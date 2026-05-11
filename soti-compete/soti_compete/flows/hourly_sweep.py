@@ -6,6 +6,7 @@ import logging
 
 from soti_compete.config import Config
 from soti_compete.flows.pipeline import (
+    ROADMAP_STUB,
     FlowResult,
     dedupe_briefs,
     persist_and_route,
@@ -23,8 +24,6 @@ from soti_compete.storage import Storage
 from soti_compete.time_utils import now_local
 
 log = logging.getLogger(__name__)
-
-ROADMAP_STUB = "[STUB] Jira/Productboard not connected."
 
 
 def run_hourly_sweep(
@@ -81,8 +80,8 @@ def run_hourly_sweep(
         teams=teams,
         flow="hourly",
     )
+    storage.save_briefs(everything_else)
     for b in everything_else:
-        storage.save_brief(b)
         result.briefs_persisted += 1
         result.by_bucket[b.bucket] = result.by_bucket.get(b.bucket, 0) + 1
 

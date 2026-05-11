@@ -53,6 +53,10 @@ class Storage(ABC):
     @abstractmethod
     def save_brief(self, brief: Brief) -> None: ...
 
+    def save_briefs(self, briefs: list[Brief]) -> None:
+        for b in briefs:
+            self.save_brief(b)
+
     @abstractmethod
     def get_brief(self, brief_id: str) -> Brief | None: ...
 

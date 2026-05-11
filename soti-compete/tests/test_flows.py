@@ -3,8 +3,6 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime, timedelta
 
-import pytest
-
 from soti_compete.flows import (
     run_daily_scan,
     run_hourly_sweep,
@@ -16,37 +14,8 @@ from soti_compete.flows.pipeline import (
     persist_and_route,
     score_and_build_brief,
 )
-from soti_compete.llm.client import LLMResponse
-from soti_compete.notify import SMTPNotifier, TeamsNotifier
-from soti_compete.storage import SQLiteStorage
-
-
-class FakeLLM:
-    def __init__(self, responses: list[LLMResponse]):
-        self._responses = list(responses)
-        self.calls: list[dict] = []
-
-    def complete(self, **kwargs):
-        self.calls.append(kwargs)
-        if not self._responses:
-            return LLMResponse(text="")
-        return self._responses.pop(0)
-
-
-def _fake_response(text: str, *, search_count: int = 0) -> LLMResponse:
-    return LLMResponse(text=text, search_count=search_count, stop_reason="end_turn")
-
-
-@pytest.fixture
-def storage(tmp_path):
-    return SQLiteStorage(tmp_path / "test.db")
-
-
-@pytest.fixture
-def notifiers(tmp_path):
-    smtp = SMTPNotifier(host="", dry_run=True, outbox_dir=tmp_path / "outbox", sender="bot@soti.example")
-    teams = TeamsNotifier(webhook_url="", dry_run=True, outbox_dir=tmp_path / "outbox")
-    return smtp, teams
+from tests.conftest import FakeLLM
+from tests.conftest import fake_response as _fake_response
 
 
 def _p0_item() -> dict:
@@ -203,7 +172,7 @@ def test_persist_and_route_p1_digest_only_when_requested(config, storage, notifi
 
     persist_and_route(
         [brief], config=config, storage=storage, smtp=smtp, teams=teams, flow="daily",
-        route_p1_digest=True,
+        p1_strategy="digest",
     )
     assert len(list((tmp_path / "outbox").glob("*.eml"))) == 1
 
